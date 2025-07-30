@@ -1,8 +1,7 @@
 "use client";
 
 import { IconTrendingDown, IconTrendingUp } from "@tabler/icons-react";
-import { supabase } from "@/app/auth/client";
-
+import { supabase } from "@/app/_utils/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import {
   AlertDialog,
@@ -100,14 +99,7 @@ export function SectionCards() {
                     <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
                       {trip.destinations}
                     </CardTitle>
-                    <CardAction>
-                      <Badge
-                        variant="outline"
-                        className="bg-green w-[70px] h-[26px]"
-                      >
-                        Ongoing
-                      </Badge>
-                    </CardAction>
+                    <CardAction></CardAction>
                   </CardHeader>
                   <CardFooter className="flex items-start justify-between gap-1.5 text-sm">
                     <div className="flex-col">

@@ -13,7 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
-import { supabase } from "../client";
+import { supabase } from "@/app/_utils/supabase/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 // Backend login Logic

@@ -36,11 +36,7 @@ const HANGAR_RECT_SIZE = 0.0002;
 /* ──────────────────────────────  SMALL HELPERS  ──────────────────────────── */
 
 const colourForPhase = (p: TripPhase) =>
-  p === "ONGOING"
-    ? "#1DB954" // green
-    : p === "RETURNING"
-    ? "#F59E0B" // orange
-    : "#065F46"; // dark green (completed)
+  p === "ONGOING" ? "#1DB954" : p === "RETURNING" ? "#F59E0B" : "#065F46";
 
 const distance = (
   [aLat, aLng]: readonly [number, number],
@@ -67,7 +63,6 @@ const progressFor = (
 /* ──────────────────────────────  COMPONENT  ──────────────────────────────── */
 
 export default function AirportMap() {
-  /* 1. Bring in trips from BOTH stores */
   const { trips: formTrips } = useTripFormStore2();
   const tripStore = useTripStore();
   const {
@@ -77,21 +72,17 @@ export default function AirportMap() {
     resetAllTrips,
   } = tripStore;
 
-  // Remove excessive console logs - only log when there are actual changes
   const prevFormTripsLength = useRef(formTrips.length);
   const prevAnimatedTripsLength = useRef(animatedTrips.length);
 
   if (formTrips.length !== prevFormTripsLength.current) {
-    console.log("Form trips changed:", formTrips.length);
     prevFormTripsLength.current = formTrips.length;
   }
 
   if (animatedTrips.length !== prevAnimatedTripsLength.current) {
-    console.log("Animated trips changed:", animatedTrips.length);
     prevAnimatedTripsLength.current = animatedTrips.length;
   }
 
-  /* 2. Sync NEW trips from the form store into the animation store */
   const processedTripIds = useRef<Set<string>>(new Set());
 
   useEffect(() => {
@@ -100,7 +91,6 @@ export default function AirportMap() {
     );
 
     if (newTrips.length > 0) {
-      console.log("Processing new trips:", newTrips);
       const formatted = newTrips.map((t) => ({
         id: t.id,
         vehicle: t.vehicles,
@@ -109,12 +99,10 @@ export default function AirportMap() {
 
       initializeTrips(formatted);
 
-      // Mark these trips as processed
       newTrips.forEach((t) => processedTripIds.current.add(t.id));
     }
   }, [formTrips, initializeTrips]);
 
-  /* 3. Animation loop - only start if there are active trips */
   const frameRef = useRef<number | null>(null);
   const activeTrips = animatedTrips.filter((t) => t.phase !== "COMPLETED");
 
@@ -127,17 +115,11 @@ export default function AirportMap() {
         frameRef.current = requestAnimationFrame(loop);
       };
 
-      console.log(
-        "🎬 Starting animation loop with",
-        activeTrips.length,
-        "active trips"
-      );
       frameRef.current = requestAnimationFrame(loop);
     };
 
     const stopAnimation = () => {
       if (frameRef.current) {
-        console.log("⏹️ Stopping animation loop");
         cancelAnimationFrame(frameRef.current);
         frameRef.current = null;
       }
@@ -150,21 +132,7 @@ export default function AirportMap() {
     }
 
     return stopAnimation;
-  }, [tick, activeTrips.length]); // Depend on activeTrips.length, not the array itself
-
-  /* 4. Debug info */
-  useEffect(() => {
-    console.log("📊 Active trips count:", activeTrips.length);
-    if (activeTrips.length > 0) {
-      activeTrips.forEach((trip, index) => {
-        console.log(
-          `📍 Trip ${trip.id}: position [${trip.currentPos[0].toFixed(
-            6
-          )}, ${trip.currentPos[1].toFixed(6)}], phase: ${trip.phase}`
-        );
-      });
-    }
-  }, [activeTrips.length, animatedTrips]); // Log when trips or positions change
+  }, [tick, activeTrips.length]);
 
   /* 5. RENDER */
   return (

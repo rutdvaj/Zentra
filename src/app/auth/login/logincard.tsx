@@ -13,33 +13,38 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
-import { supabase } from "../client";
+import { supabase } from "@/app/_utils/supabase/client";
 import { useRouter } from "next/navigation";
+import { createClient } from "@/app/_utils/supabase/server";
 
 export default function LoginDemo() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    console.log(email, pass);
-  };
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Login function
   async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setIsLoading(true);
+    console.log("🔐 Starting login process...");
+
+    // Create the client inside the function
+
     const { data, error } = await supabase.auth.signInWithPassword({
       email: email,
       password: pass,
     });
+
     if (error) {
-      console.error("Login error:", error.message);
-      // Show user-friendly error message
+      console.error("❌ Login error:", error.message);
+      setIsLoading(false);
     } else {
-      console.log("Login success:", data);
-      // Optionally show a message like "Check your email for confirmation"
+      console.log("✅ Login success:", data);
+      // Force a page refresh to ensure middleware picks up the new session
+      window.location.href = "/layout";
     }
   }
+
   return (
     <Card className="w-full max-w-sm">
       <CardHeader>
@@ -88,9 +93,9 @@ export default function LoginDemo() {
             <Button
               type="submit"
               className="w-full cursor-pointer"
-              onClick={() => router.push("/layout")}
+              disabled={isLoading}
             >
-              Login
+              {isLoading ? "Logging in..." : "Login"}
             </Button>
             <Button variant="outline" className="w-full cursor-pointer">
               Reset password
