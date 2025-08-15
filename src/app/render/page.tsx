@@ -14,7 +14,7 @@ const AirportMap = dynamic(() => import("../_dashboard/mapview"), {
   ssr: false,
 });
 
-export default function Oglayout({ children }: { children: React.ReactNode }) {
+export default function Oglayout() {
   return (
     <ProtectedLayout>
       <SidebarProvider
